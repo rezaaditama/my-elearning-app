@@ -1,68 +1,64 @@
+@import 'tailwindcss';
+@config "../tailwind.config.ts";
+
+/* Light mode (default) */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Primary */
+  --color-primary: 59 130 246; /* blue-500 */
+  --color-primary-hover: 37 99 235; /* blue-600 */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  /* Secondary */
+  --color-secondary: 30 41 59; /* slate-800 */
+  --color-secondary-hover: 2 6 23; /* slate-900 */
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /* Accent */
+  --color-accent: 234 179 8; /* yellow-500 */
+  --color-accent-hover: 217 119 6; /* yellow-600 */
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* Neutral */
+  --color-neutral: 17 24 39; /* slate-900 (text) */
+  --color-muted: 100 116 139; /* slate-500 (muted text) */
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  /* Surface  */
+  --color-surface: 245 245 245; /* gray-100 */
+  --color-surface-contrast: 255 255 255; /* card bg white */
+
+  /* Danger / Error */
+  --color-danger: 239 68 68; /* red-500 */
+  --color-danger-hover: 220 38 38; /* red-600 */
+
+  /* Semantic extras */
+  --color-success: 16 185 129; /* green-500 */
+  --color-success-hover: 5 150 105;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Dark mode */
+.dark {
+  --color-primary: 165 180 252; /* indigo-200 */
+  --color-primary-hover: 129 140 248; /* indigo-300 */
+
+  --color-secondary: 30 41 59; /* slate-800  */
+  --color-secondary-hover: 2 6 23; /* slate-900 */
+
+  --color-accent: 253 224 71; /* yellow-300 */
+  --color-accent-hover: 250 204 21;
+
+  --color-neutral: 229 231 235; /* slate-200  */
+  --color-muted: 148 163 184; /* slate-400 */
+
+  --color-surface: 17 24 39; /* slate-900  */
+  --color-surface-contrast: 30 41 59; /* dark-slate */
+
+  --color-danger: 248 113 113;
+  --color-danger-hover: 239 68 68;
+
+  --color-success: 110 231 183;
+  --color-success-hover: 52 211 153;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+/* Animation Custom  */
+@layer components {
+  .animation-card {
+    @apply hover:shadow-xl hover:-translate-y-2 transition duration-300 dark:hover:bg-slate-700/10;
   }
 }
