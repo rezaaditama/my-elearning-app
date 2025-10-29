@@ -84,7 +84,7 @@ const AuthLayout = () => {
       alert('Tidak ada quiz yang tersimpan, silahkan login kembali');
       return;
     }
-    navigate('/quiz');
+    navigate('/setup');
   };
 
   return (
@@ -102,6 +102,7 @@ const AuthLayout = () => {
           id='email'
           type='email'
           placeholder='Enter your e-mail'
+          defaultValue={user?.email ?? ''}
           required
         />
         <Input
@@ -109,9 +110,15 @@ const AuthLayout = () => {
           id='fullname'
           type='text'
           placeholder='Enter your name'
+          defaultValue={user?.fullname ?? ''}
           required
         />
       </div>
+      {error && (
+        <div role='alert' className='text-sm text-danger'>
+          {error}
+        </div>
+      )}
       <div className='text-center space-y-2'>
         <Button type='submit'>
           {localStorage.getItem(LOCALSTORAGE_KEY) ? 'Continue Quiz' : 'Submit'}

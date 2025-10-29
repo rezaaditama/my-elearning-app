@@ -4,7 +4,7 @@ import './index.css';
 import LoginPage from './pages/LoginPage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/ErrorPage';
-import QuizPage from './pages/QuizPage';
+import QuizPage from './pages/SetupQuizPage';
 
 const router = createBrowserRouter([
   {
@@ -13,7 +13,7 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: '/quiz',
+    path: '/setup',
     element: <QuizPage />,
   },
 ]);

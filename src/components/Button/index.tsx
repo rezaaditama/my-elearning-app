@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type Variant = 'primary' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'ghost';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -12,6 +12,7 @@ const baseStyle = 'w-full rounded-md font-bold cursor-pointer';
 
 const variantClass = {
   primary: 'bg-primary text-surface hover:bg-primary-hover p-1.5',
+  secondary: 'bg-secondary text-surface hover:bg-secondary-hover p-1.5',
   ghost: 'bg-transparent',
 };
 
