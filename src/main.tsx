@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/ErrorPage';
 import QuizPage from './pages/SetupQuizPage';
+import QuizSessionPage from './pages/QuizSessionPage';
 
 const router = createBrowserRouter([
   {
@@ -13,13 +14,17 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
   },
   {
-    path: '/setup',
+    path: '/quiz-setup',
     element: <QuizPage />,
+  },
+  {
+    path: '/quiz-session',
+    element: <QuizSessionPage />,
   },
 ]);
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>
+  // <StrictMode>
+  <RouterProvider router={router} />
+  // </StrictMode>
 );

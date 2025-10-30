@@ -11,8 +11,8 @@ interface User {
 
 // Utils validasi email
 const validateEmail = (value: string) => {
-  const v = value.trim();
-  return v.length > 3 && /\S+@\S+\.\S+/.test(v);
+  const emailValid = value.trim();
+  return emailValid.length > 3 && /\S+@\S+\.\S+/.test(emailValid);
 };
 
 //localstorage user
@@ -69,7 +69,7 @@ const AuthLayout = () => {
 
     try {
       localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(user));
-      navigate('/quiz');
+      navigate('/quiz-setup');
     } catch (error) {
       console.error('Gagal menyimpan data ke localstorage', error);
       setError(
@@ -84,7 +84,7 @@ const AuthLayout = () => {
       alert('Tidak ada quiz yang tersimpan, silahkan login kembali');
       return;
     }
-    navigate('/setup');
+    navigate('/quiz-setup');
   };
 
   return (

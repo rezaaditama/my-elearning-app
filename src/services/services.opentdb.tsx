@@ -51,9 +51,9 @@ export const getCategories = async (): Promise<Category[]> => {
 //Mengambil data pertanyaan
 export const fetchQuestions = async (userConfiguration: {
   amount: number;
-  category: number;
-  difficulty: string;
-  type: string;
+  category?: number;
+  difficulty?: string;
+  type?: string;
 }): Promise<RawQuestions[]> => {
   const urlParams = new URLSearchParams();
   urlParams.set('amount', String(userConfiguration.amount));
@@ -66,13 +66,12 @@ export const fetchQuestions = async (userConfiguration: {
   if (userConfiguration.type) {
     urlParams.set('type', userConfiguration.type);
   }
-  const url = `${API_BASE}/api.php?${userConfiguration.toString()}`;
+  const url = `${API_BASE}/api.php?${urlParams.toString()}`;
   const response = await axios.get(url);
   if (response.data.response_code !== 0) {
     throw Error(
       `OpenTDB returned response_code=${response.data.response_code}`
     );
   }
-  console.log(response.data.results);
   return response.data.results as RawQuestions[];
 };
