@@ -1,221 +1,3 @@
-// import { useEffect, useState } from 'react';
-// import Button from '../components/Button';
-// import { getCategories, type Category } from '../services/services.opentdb';
-
-// export type QuizConfig = {
-//   amount: number;
-//   category?: number | undefined;
-//   difficulty?: 'easy' | 'medium' | 'hard' | '';
-//   type?: 'multiple' | 'boolean' | '';
-//   totalTime: number;
-// };
-
-// const FormSetupQuiz = ({
-//   onSubmit,
-// }: {
-//   onSubmit: (userConfiguration: QuizConfig) => void;
-// }) => {
-//   //Fetching State
-//   const [categories, setCategories] = useState<Category[]>([]);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState<string | null>(null);
-
-//   //Form State
-//   const [amount, setAmount] = useState<number>(10);
-//   const [category, setCategory] = useState<number | ''>('');
-//   const [difficulty, setDifficulty] = useState<QuizConfig['difficulty']>('');
-//   const [type, setType] = useState<QuizConfig['type']>('multiple');
-//   const [minutes, setMinutes] = useState<number>(5);
-
-//   //Fetching Data Category
-//   useEffect(() => {
-//     let mounted = true;
-//     (async () => {
-//       try {
-//         setLoading(true);
-//         const data = await getCategories();
-//         if (!data) return;
-//         setCategories(data);
-//       } catch (error) {
-//         console.error('Gagal memfetching data', error);
-//         if (mounted) {
-//           setError('Gagal mengambil kategori. Coba Refresh Halaman');
-//         }
-//       } finally {
-//         if (mounted) setLoading(false);
-//       }
-//     })();
-//     return () => {
-//       mounted = false;
-//     };
-//   }, []);
-
-//   //Fungsi Handle Start Quiz
-//   const handleStart = () => {
-//     if (!amount || amount < 1) {
-//       setError('⚠️ Semua field wajib diisi dengan benar.');
-//       return;
-//     }
-//     setError(null);
-
-//     const UserConfiguration: QuizConfig = {
-//       amount,
-//       category: category === '' ? 10 : category,
-//       difficulty: difficulty === '' ? 'easy' : difficulty,
-//       type: type === '' ? 'multiple' : type,
-//       totalTime: minutes * 60,
-//     };
-//     onSubmit(UserConfiguration);
-//   };
-
-//   return (
-//     <div className='min-h-screen min-w-screen flex justify-center items-center'>
-//       <div className='border p-5 space-y-4 border-neutral/50 shadow-md rounded-md w-1/3'>
-//         <h1 className='text-2xl font-bold text-primary text-center'>
-//           Setup Your Quiz
-//         </h1>
-//         {error && (
-//           <div className='mb-4 text-center border border-danger bg-danger/15 text-danger px-4 py-3 rounded relative'>
-//             {error}
-//           </div>
-//         )}
-//         <div>
-//           {/* Jumlah soal */}
-//           <h2 className='font-bold text-neutral/80 text-md'>
-//             Number of Questions
-//           </h2>
-//           <select
-//             id='amount'
-//             value={amount}
-//             className='w-full border rounded-md p-2 mt-1 block px-3 py-2 border-neutral/50 shadow-sm focus:outline-neutral/50 focus:outline-1'
-//           >
-//             <option value='5'>5</option>
-//             <option value='10'>10</option>
-//             <option value='15'>15</option>
-//             <option value='20'>20</option>
-//           </select>
-//         </div>
-
-//         {/* Kategori */}
-//         <div>
-//           <h2 className='font-bold text-neutral/80 text-md'>Category</h2>
-//           <select
-//             id='category'
-//             value={category}
-//             onChange={(e) =>
-//               setCategory(e.target.value === '' ? '' : Number(e.target.value))
-//             }
-//             className='w-full border rounded-md p-2 mt-1 block px-3 py-2 border-neutral/50 shadow-sm focus:outline-neutral/50 focus:outline-1'
-//           >
-//             {loading ? (
-//               <option value=''>Loading...</option>
-//             ) : (
-//               categories.map((category) => (
-//                 <option key={category.id} value={category.id}>
-//                   {category.name}
-//                 </option>
-//               ))
-//             )}
-//           </select>
-//         </div>
-
-//         {/* Kesulitan */}
-//         <fieldset>
-//           <legend className='font-bold text-neutral/80 text-md'>
-//             Difficult
-//           </legend>
-//           <div className='flex flex-col space-y-1'>
-//             <label className='space-x-2'>
-//               <input
-//                 type='radio'
-//                 name='difficulty'
-//                 checked={difficulty === 'easy'}
-//                 onChange={() => setDifficulty('easy')}
-//               />
-//               <span>Easy</span>
-//             </label>
-//             <label className='space-x-2'>
-//               <input
-//                 type='radio'
-//                 name='difficulty'
-//                 checked={difficulty === 'medium'}
-//                 onChange={() => setDifficulty('medium')}
-//               />
-//               <span>Medium</span>
-//             </label>
-//             <label className='space-x-2'>
-//               <input
-//                 type='radio'
-//                 name='difficulty'
-//                 checked={difficulty === 'hard'}
-//                 onChange={() => setDifficulty('hard')}
-//               />
-//               <span>Hard</span>
-//             </label>
-//           </div>
-//         </fieldset>
-
-//         {/* Type */}
-//         <fieldset className='flex flex-col space-y-1'>
-//           <legend className='font-bold text-neutral/80 text-md'>Type</legend>
-//           <div className='flex flex-col space-y-1'>
-//             <label className='space-x-2'>
-//               <input
-//                 type='radio'
-//                 name='type'
-//                 checked={type === 'multiple'}
-//                 onChange={() => setType('multiple')}
-//               />
-//               <span>Multiple Choice</span>
-//             </label>
-//             <label className='space-x-2'>
-//               <input
-//                 type='radio'
-//                 name='type'
-//                 checked={type === 'boolean'}
-//                 onChange={() => setType('boolean')}
-//               />
-//               <span>True / False</span>
-//             </label>
-//           </div>
-//         </fieldset>
-
-//         {/* Timer */}
-//         <label className='block mb-4'>
-//           <div className='text-sm font-medium mb-1'>Time (minutes)</div>
-//           <input
-//             type='number'
-//             min={1}
-//             max={120}
-//             value={minutes}
-//             onChange={(e) => setMinutes(Math.max(1, Number(e.target.value)))}
-//             className='w-full p-2 border rounded'
-//           />
-//         </label>
-
-//         {/* Trigger */}
-//         <Button variant='primary' onClick={handleStart}>
-//           Start Quiz
-//         </Button>
-//         <Button
-//           variant='secondary'
-//           onClick={() => {
-//             setAmount(10);
-//             setCategory('');
-//             setDifficulty('');
-//             setType('multiple');
-//             setMinutes(5);
-//           }}
-//         >
-//           Reset
-//         </Button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default FormSetupQuiz;
-
 import { useEffect, useState } from 'react';
 import Button from '../components/Button';
 import { getCategories, type Category } from '../services/services.opentdb';
@@ -223,6 +5,10 @@ import { quizConfigSchema, type quizConfig } from '../schemas/quizConfig';
 import { useLocalStorage } from '../Hooks/useLocalStorage';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import FormField from '../components/Form/FormField';
+import Input from '../components/Form/Input';
+import { useNavigate } from 'react-router-dom';
+import { clearQuizState, loadQuizState } from '../utils/storage';
 
 type FormSetupQuizProps = {
   onSubmit: (userConfiguration: quizConfig) => void;
@@ -234,12 +20,15 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasResume, setHasResume] = useState(false);
 
   //Form State
   const [savedDraft, setSavedDraft] = useLocalStorage<quizConfig | null>(
     'quiz_config_v1',
     null
   );
+
+  const navigate = useNavigate();
 
   // React Hook Form dengan Zod
   const {
@@ -303,15 +92,50 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
     });
   };
 
+  useEffect(() => {
+    try {
+      const saved = loadQuizState();
+      const storeData = localStorage.getItem('quiz_resume_v1');
+      setHasResume(Boolean(saved ?? storeData));
+    } catch (error) {
+      setHasResume(false);
+    }
+  }, []);
+
   const onFormSubmit = (values: quizConfig) => {
     const configuration = quizConfigSchema.parse(values);
     try {
+      try {
+        clearQuizState();
+      } catch {}
       localStorage.setItem('quiz_config_v1', JSON.stringify(configuration));
     } catch (error) {
       console.warn('Failed to save quiz_config_v1', error);
     }
     onSubmit(configuration);
   };
+
+  const handleContinue = () => {
+    try {
+      const saved = loadQuizState();
+      const fallback = (() => {
+        const raw = localStorage.getItem('quiz_resume_v1');
+        return raw ? JSON.parse(raw) : null;
+      })();
+
+      const resume = saved ?? fallback;
+
+      if (!resume) {
+        window.alert('Tidak ada sesi kuis tersimpan untuk dilanjutkan.');
+        return;
+      }
+      navigate('/quiz-session');
+    } catch (error) {
+      console.error('Failed to read resume', error);
+      window.alert('Gagal membaca sesi tersimpan. Coba lagi.');
+    }
+  };
+
   return (
     <div
       className='min-h-screen min-w-screen flex justify-center items-center'
@@ -328,36 +152,30 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
         )}
 
         {/* Jumlah soal */}
-        <div>
-          <label className='font-bold text-neutral/80 text-md' htmlFor='amount'>
-            Number of Questions
-          </label>
+        <FormField
+          id='amount'
+          label='Number of Questions'
+          error={errors.amount?.message}
+        >
           <select
             id='amount'
             {...register('amount', { valueAsNumber: true })}
             className='w-full border rounded-md p-2 mt-1 block px-3 py-2 border-neutral/50 shadow-sm focus:outline-neutral/50 focus:outline-1'
           >
-            {AMOUNT_OPTIONS.map((option) => (
-              <option key={option} value={option}>
-                {option}
+            {AMOUNT_OPTIONS.map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
               </option>
             ))}
           </select>
-          {errors.amount && (
-            <p role='alert' className='text-sm text-danger mt-1'>
-              {errors.amount.message}
-            </p>
-          )}
-        </div>
+        </FormField>
 
         {/* Kategori */}
-        <div>
-          <label
-            className='font-bold text-neutral/80 text-md'
-            htmlFor='category'
-          >
-            Category
-          </label>
+        <FormField
+          id='category'
+          label='Category'
+          error={errors.category?.message}
+        >
           <select
             id='category'
             onChange={(e) => {
@@ -381,16 +199,17 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
               ))
             )}
           </select>
-        </div>
+        </FormField>
 
         {/* Difficulty */}
-        <fieldset>
-          <legend className='font-bold text-neutral/80 text-md'>
-            Difficulty
-          </legend>
+        <FormField
+          label='Difficulty'
+          id='difficulty'
+          error={errors.difficulty?.message}
+        >
           <div className='flex flex-col gap-y-1'>
             {['easy', 'medium', 'hard'].map((value) => (
-              <label key={value} className='flex items-center gap-2'>
+              <label key={value} className='flex gap-2'>
                 <input
                   type='radio'
                   value={value}
@@ -401,13 +220,10 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
               </label>
             ))}
           </div>
-        </fieldset>
+        </FormField>
 
         {/* Type */}
-        <fieldset>
-          <legend className='font-bold text-neutral/80 text-md'>
-            Question Type
-          </legend>
+        <FormField label='Question Type' id='type' error={errors.type?.message}>
           <div className='flex flex-row gap-4 mt-2'>
             {['multiple', 'boolean'].map((value) => (
               <label key={value} className='flex items-center gap-2'>
@@ -423,12 +239,15 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
               </label>
             ))}
           </div>
-        </fieldset>
+        </FormField>
 
         {/* Timer */}
-        <label className='block mb-4'>
-          <div className='text-sm font-medium mb-1'>Time (minutes)</div>
-          <input
+        <FormField
+          label='Time (minutes)'
+          id='totalTime'
+          error={errors.totalTime?.message}
+        >
+          <Input
             type='number'
             min={1}
             max={24 * 60}
@@ -442,16 +261,23 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
               {errors.totalTime.message}
             </p>
           )}
-        </label>
+        </FormField>
 
         {/* Trigger */}
         <div className='flex flex-col gap-y-2'>
           <Button variant='primary' type={'submit'} disabled={isSubmitting}>
-            Start Quiztype
+            Start Quiz
           </Button>
-          <Button type='button' variant='secondary'>
-            Continue Quiz
-          </Button>
+          {localStorage.getItem('quiz_resume_v1') && (
+            <Button
+              type='button'
+              variant='secondary'
+              onClick={handleContinue}
+              disabled={!hasResume}
+            >
+              Continue Quiz
+            </Button>
+          )}
         </div>
       </form>
     </div>

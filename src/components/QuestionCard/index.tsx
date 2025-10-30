@@ -1,46 +1,43 @@
-import { useMemo, useState } from 'react';
-import { decodeHtml } from '../../utils/htmlDecode';
+// src/components/QuestionCard.tsx
+import React, { useState } from 'react';
+import type { Question } from '../../types/quizType';
 
 type QuestionCardProps = {
-  question: any;
+  question: Question;
+  index: number;
   onAnswer: (choice: string) => void;
   disabled?: boolean;
 };
 
-const QuestionCard = ({ question, onAnswer, disabled }: QuestionCardProps) => {
+const QuestionCard: React.FC<QuestionCardProps> = ({
+  question,
+  index,
+  onAnswer,
+  disabled,
+}) => {
   const [selected, setSelected] = useState<string | null>(null);
 
-  const choices = useMemo(() => {
-    if (!question) return [];
-    const questionType =
-      question.type === 'boolean'
-        ? ['true', 'false']
-        : [question.correct_answer, ...question.incorrect_answers];
-
-    for (let i = questionType.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-
-      [questionType[i], questionType[j]] = [questionType[i], questionType[j]];
-    }
-    return questionType;
-  }, [question]);
-
-  //Fungsi Handle Select
+  //Handle Select
   const handleSelect = (value: string) => {
     if (disabled) return;
     setSelected(value);
     onAnswer(value);
-
-    if (!question) return null;
   };
+
   return (
     <div>
-      <div className='mb-4 text-sm'>{decodeHtml(question.question)}</div>
+      <div id={`question-${question.id}`} className='mb-4 text-sm'>
+        {question.question}
+      </div>
 
-      <div className='grid gap-2'>
-        {choices.map((choice) => (
+      <div
+        className='grid gap-2'
+        role='radiogroup'
+        aria-labelledby={`question-${question.id}`}
+      >
+        {question.choices.map((choice, i) => (
           <label
-            key={choice}
+            key={`${question.id}-choice-${i}`}
             className={`p-3 border rounded cursor-pointer text-left ${
               selected === choice
                 ? 'border-primary bg-primary/5'
@@ -49,13 +46,15 @@ const QuestionCard = ({ question, onAnswer, disabled }: QuestionCardProps) => {
           >
             <input
               type='radio'
-              name='quiz-choice'
+              name={`quiz-choice-${index}`}
               value={choice}
               checked={selected === choice}
               onChange={() => handleSelect(choice)}
               className='mr-3'
+              disabled={disabled}
+              aria-checked={selected === choice}
             />
-            <span>{decodeHtml(choice)}</span>
+            <span>{choice}</span>
           </label>
         ))}
       </div>

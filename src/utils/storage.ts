@@ -1,53 +1,44 @@
+import { quizResumeSchema, type QuizResume } from '../schemas/quizResume';
+
 //Key localstorage
-export const QUIZ_CONFIG_KEY = 'quiz_config_v1';
-export const QUIZ_STATE_KEY = 'quiz_state_v1';
+const STORAGE_KEY = 'quiz_resume_v1';
 
-//Tipe soal yang dijawab
-export type StoredAnswer = {
-  questionIdx: number;
-  selected: string;
-  correct: string;
-  isCorrect: boolean;
-  answeredAt?: number;
-};
-
-//Type soal keseluruhan
-export type StoredQuizState = {
-  questions?: any[];
-  answers?: StoredAnswer[];
-  currentIndex?: number;
-  startedAt?: number;
-  totalTime?: number;
-  finished?: boolean;
-  amount?: number;
-  type?: string;
-};
-
-//Fungsi menyimpan soal
-export const saveQuizState = (storageQuiz: StoredQuizState) => {
+//Simpan quiz
+export const saveQuizState = (payload: QuizResume) => {
   try {
-    localStorage.setItem(QUIZ_STATE_KEY, JSON.stringify(storageQuiz));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   } catch (error) {
-    console.error('Gagal menyimpan Quiz State', error);
+    console.warn('saveQuizState failed', error);
   }
 };
 
-//Fungsi load soal
-export const loadQuizState = (): StoredQuizState | null => {
+//Load quiz
+export const loadQuizState = (): QuizResume | null => {
   try {
-    const data = localStorage.getItem(QUIZ_STATE_KEY);
-    return data ? JSON.parse(data) : null;
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (!data) return null;
+    const parsed = JSON.parse(data);
+    const response = quizResumeSchema.safeParse(parsed);
+    if (!response.success) {
+      console.warn('loadQuizState invalid schema', response.error);
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return response.data;
   } catch (error) {
-    console.error('Load quiz state gagal', error);
+    console.warn('loadQuizState failed', error);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
     return null;
   }
 };
 
-//Fungsi clear soal
+//Cleat quiz
 export const clearQuizState = () => {
   try {
-    localStorage.removeItem(QUIZ_STATE_KEY);
+    localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
-    console.error('Clear quiz state gagal', error);
+    console.warn('clearQuizState failed', error);
   }
 };

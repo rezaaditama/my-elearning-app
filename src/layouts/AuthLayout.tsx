@@ -48,6 +48,13 @@ const AuthLayout: React.FC = () => {
       return;
     }
     setSavedUser(data.data);
+
+    try {
+      localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(data.data));
+    } catch (e) {
+      console.warn('Failed to write user to localStorage', e);
+    }
+
     navigate('/quiz-setup');
   };
   return (

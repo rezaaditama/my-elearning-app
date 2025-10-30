@@ -356,129 +356,508 @@
 
 // export default QuizSessionPage;
 
-import React, { useEffect, useState } from 'react';
+// import React, { useEffect, useState } from 'react';
+// import { useNavigate } from 'react-router-dom';
+// import {
+//   clearQuizState,
+//   loadQuizState,
+//   saveQuizState,
+//   type StoredAnswer,
+//   type StoredQuizState,
+// } from '../utils/storage';
+// import { useInterval } from '../Hooks/useInterval';
+// import { fetchQuestions } from '../services/services.opentdb';
+// import QuestionCard from '../components/QuestionCard';
+// import { decodeHtml } from '../utils/htmlDecode';
+
+// const QuizSessionPage: React.FC = () => {
+//   const navigate = useNavigate();
+
+//   const [loading, setLoading] = useState(false);
+//   const [questions, setQuestions] = useState<any[]>([]);
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [answers, setAnswers] = useState<StoredAnswer[]>([]);
+//   const [startedAt, setStartedAt] = useState<number | null>(null);
+//   const [totalTime, setTotalTime] = useState<number>(300);
+//   const [timeLeft, setTimeLeft] = useState<number>(300);
+//   const [finished, setFinished] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
+
+//   // Restore or start
+//   useEffect(() => {
+//     const saved = loadQuizState();
+//     if (saved && Array.isArray(saved.questions) && !saved.finished) {
+//       setQuestions(saved.questions);
+//       setAnswers(saved.answers ?? []);
+//       setCurrentIndex(saved.currentIndex ?? 0);
+//       setStartedAt(saved.startedAt ?? Date.now());
+//       setTotalTime(saved.totalTime ?? 300);
+//       const elapsed = Math.floor(
+//         (Date.now() - (saved.startedAt ?? Date.now())) / 1000
+//       );
+//       const left = Math.max(0, (saved.totalTime ?? 300) - elapsed);
+//       setTimeLeft(left);
+//       if (left <= 0) setFinished(true);
+//       return;
+//     }
+
+//     const cfgRaw = localStorage.getItem('quiz_config_v1');
+//     if (!cfgRaw) {
+//       setError('Konfigurasi kuis tidak ditemukan. Kembali ke setup.');
+//       return;
+//     }
+//     const cfg = JSON.parse(cfgRaw) as {
+//       amount: number;
+//       category?: number;
+//       difficulty?: string;
+//       type?: string;
+//       totalTime: number;
+//     };
+//     startNewSession(cfg).catch((e) => {
+//       console.error(e);
+//       setError(String(e) || 'Gagal memulai kuis');
+//     });
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, []);
+
+//   useInterval(() => {
+//     if (!startedAt || finished) return;
+//     const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+//     const left = Math.max(0, totalTime - elapsed);
+//     setTimeLeft(left);
+//     if (left <= 0) handleFinish();
+//   }, 1000);
+
+//   async function startNewSession(cfg: {
+//     amount: number;
+//     category?: number;
+//     difficulty?: string;
+//     type?: string;
+//     totalTime: number;
+//   }) {
+//     setLoading(true);
+//     setError(null);
+//     try {
+//       const qs = await fetchQuestions({
+//         amount: cfg.amount,
+//         category: cfg.category,
+//         difficulty: cfg.difficulty,
+//         type: cfg.type,
+//       });
+//       setQuestions(qs);
+//       setAnswers([]);
+//       setCurrentIndex(0);
+//       const now = Date.now();
+//       setStartedAt(now);
+//       const tt = cfg.totalTime ?? 300;
+//       setTotalTime(tt);
+//       setTimeLeft(tt);
+//       setFinished(false);
+
+//       const state: StoredQuizState = {
+//         questions: qs,
+//         answers: [],
+//         currentIndex: 0,
+//         startedAt: now,
+//         totalTime: tt,
+//         finished: false,
+//         amount: cfg.amount,
+//         type: cfg.type,
+//       };
+//       saveQuizState(state);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+
+//   const handleAnswer = (choice: string) => {
+//     if (!questions[currentIndex]) return;
+//     // prevent double
+//     if (answers.some((a) => a.questionIdx === currentIndex)) return;
+
+//     const q = questions[currentIndex];
+//     const correct = q.correct_answer;
+//     const isCorrect = choice === correct;
+//     const ans: StoredAnswer = {
+//       questionIdx: currentIndex,
+//       selected: choice,
+//       correct,
+//       isCorrect,
+//       answeredAt: Date.now(),
+//     };
+
+//     const nextAnswers = [...answers, ans];
+//     setAnswers(nextAnswers);
+
+//     const persisted: StoredQuizState = {
+//       questions,
+//       answers: nextAnswers,
+//       currentIndex: currentIndex + 1,
+//       startedAt: startedAt ?? Date.now(),
+//       totalTime,
+//       finished: false,
+//       amount: questions.length,
+//       type: questions[0]?.type,
+//     };
+//     saveQuizState(persisted);
+
+//     if (currentIndex + 1 < questions.length) setCurrentIndex((i) => i + 1);
+//     else handleFinish();
+//   };
+
+//   const handleFinish = () => {
+//     setFinished(true);
+//     const persisted: StoredQuizState = {
+//       questions,
+//       answers,
+//       currentIndex,
+//       startedAt: startedAt ?? Date.now(),
+//       totalTime,
+//       finished: true,
+//       amount: questions.length,
+//       type: questions[0]?.type,
+//     };
+//     saveQuizState(persisted);
+//   };
+
+//   const handleAbort = () => {
+//     if (!confirm('Yakin batalkan kuis? Progress akan dihapus.')) return;
+//     clearQuizState();
+//     navigate('/quiz-setup');
+//   };
+
+//   const handleSubmitAndExit = () => {
+//     // navigate to result page (leading slash)
+//     navigate('/quiz-result', {
+//       state: { questions, answers, totalTime, startedAt },
+//     });
+//   };
+
+//   // derived
+//   const total = questions.length;
+//   const answeredCount = answers.length;
+//   const correctCount = answers.filter((a) => a.isCorrect).length;
+//   const wrongCount = answeredCount - correctCount;
+
+//   const formatTime = (s: number) => {
+//     const m = Math.floor(s / 60);
+//     const sec = s % 60;
+//     return `${m}:${sec.toString().padStart(2, '0')}`;
+//   };
+
+//   // UI guards
+//   if (error) {
+//     return (
+//       <div className='p-6 max-w-xl mx-auto'>
+//         <div className='card'>
+//           <div className='text-danger mb-3'>{error}</div>
+//           <div className='flex gap-2'>
+//             <button
+//               onClick={() => navigate('/quiz-setup')}
+//               className='btn-secondary'
+//             >
+//               Back to setup
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   if (loading && questions.length === 0) {
+//     return (
+//       <div className='page-center'>
+//         <div>Loading questions...</div>
+//       </div>
+//     );
+//   }
+
+//   if (finished || timeLeft <= 0) {
+//     return (
+//       <div className='p-6 max-w-xl mx-auto'>
+//         <div className='card'>
+//           <h2 className='text-xl font-semibold mb-4'>Hasil Kuis</h2>
+//           <p>Total soal: {total}</p>
+//           <p>Jumlah dijawab: {answeredCount}</p>
+//           <p>Benar: {correctCount}</p>
+//           <p>Salah: {wrongCount}</p>
+
+//           <div className='mt-4 flex gap-2'>
+//             <button
+//               className='btn-primary'
+//               onClick={() => {
+//                 clearQuizState();
+//                 navigate('/quiz-setup');
+//               }}
+//             >
+//               Mulai Ulang
+//             </button>
+//             <button
+//               className='btn-secondary'
+//               onClick={() => {
+//                 clearQuizState();
+//                 navigate('/');
+//               }}
+//             >
+//               Logout
+//             </button>
+//             <button className='btn-secondary' onClick={handleSubmitAndExit}>
+//               Lihat Detail / Export
+//             </button>
+//           </div>
+
+//           <hr className='my-4' />
+//           <h3 className='font-semibold mb-2'>Detail Jawaban</h3>
+//           <div className='space-y-3'>
+//             {answers.map((a) => {
+//               const q = questions[a.questionIdx];
+//               return (
+//                 <div key={a.questionIdx} className='p-3 border rounded'>
+//                   <div className='text-sm mb-1'>{decodeHtml(q.question)}</div>
+//                   <div className='text-xs'>
+//                     Jawaban kamu: {decodeHtml(a.selected)}
+//                   </div>
+//                   <div className='text-xs'>
+//                     Jawaban benar: {decodeHtml(a.correct)}
+//                   </div>
+//                   <div
+//                     className={`text-xs ${
+//                       a.isCorrect ? 'text-success' : 'text-danger'
+//                     }`}
+//                   >
+//                     {a.isCorrect ? 'Benar' : 'Salah'}
+//                   </div>
+//                 </div>
+//               );
+//             })}
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   // normal quiz UI - guard that question exists
+//   const currentQuestion = questions[currentIndex];
+//   if (!currentQuestion) {
+//     return (
+//       <div className='page-center'>
+//         <div>Menunggu soal...</div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className='p-6 max-w-xl mx-auto'>
+//       <div className='flex justify-between items-center mb-4'>
+//         <div>
+//           Total soal: {total} | Dikerjakan: {answeredCount}
+//         </div>
+//         <div>
+//           Time left: <span className='font-mono'>{formatTime(timeLeft)}</span>
+//         </div>
+//       </div>
+
+//       <div className='card animation-card'>
+//         <h3 className='mb-2'>
+//           Soal {currentIndex + 1} / {total}
+//         </h3>
+
+//         <QuestionCard
+//           question={currentQuestion}
+//           onAnswer={handleAnswer}
+//           disabled={finished}
+//         />
+
+//         <div className='mt-4 flex gap-2'>
+//           <button
+//             onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+//             disabled={currentIndex === 0}
+//           >
+//             Prev
+//           </button>
+//           <button
+//             onClick={() => setCurrentIndex((i) => Math.min(total - 1, i + 1))}
+//             disabled={currentIndex === total - 1}
+//           >
+//             Next
+//           </button>
+//           <button onClick={() => handleFinish()} className='ml-auto'>
+//             Submit
+//           </button>
+//           <button onClick={() => handleAbort()} className='ml-2 btn-secondary'>
+//             Abort
+//           </button>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default QuizSessionPage;
+
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  clearQuizState,
-  loadQuizState,
-  saveQuizState,
-  type StoredAnswer,
-  type StoredQuizState,
-} from '../utils/storage';
+import { loadQuizState, saveQuizState, clearQuizState } from '../utils/storage';
 import { useInterval } from '../Hooks/useInterval';
-import { fetchQuestions } from '../services/services.opentdb';
+import { fetchAndMapQuestions } from '../services/services.opentdb';
 import QuestionCard from '../components/QuestionCard';
-import { decodeHtml } from '../utils/htmlDecode';
+import type { Question } from '../types/quizType';
+import { throttle } from '../utils/throttle';
 
 const QuizSessionPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<StoredAnswer[]>([]);
-  const [startedAt, setStartedAt] = useState<number | null>(null);
-  const [totalTime, setTotalTime] = useState<number>(300);
-  const [timeLeft, setTimeLeft] = useState<number>(300);
+  const [answers, setAnswers] = useState<
+    {
+      questionIdx: number;
+      selected: string;
+      correct?: string;
+      isCorrect: boolean;
+      answeredAt: number;
+    }[]
+  >([]);
+  const [endTimestamp, setEndTimestamp] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState<number>(0);
   const [finished, setFinished] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // throttle save
+  const saveThrottled = useRef(
+    throttle((payload: any) => saveQuizState(payload), 700)
+  );
 
   // Restore or start
   useEffect(() => {
     const saved = loadQuizState();
-    if (saved && Array.isArray(saved.questions) && !saved.finished) {
-      setQuestions(saved.questions);
-      setAnswers(saved.answers ?? []);
-      setCurrentIndex(saved.currentIndex ?? 0);
-      setStartedAt(saved.startedAt ?? Date.now());
-      setTotalTime(saved.totalTime ?? 300);
-      const elapsed = Math.floor(
-        (Date.now() - (saved.startedAt ?? Date.now())) / 1000
+    if (saved) {
+      const left = Math.max(
+        0,
+        Math.ceil((saved.endTimestamp - Date.now()) / 1000)
       );
-      const left = Math.max(0, (saved.totalTime ?? 300) - elapsed);
-      setTimeLeft(left);
-      if (left <= 0) setFinished(true);
-      return;
+      if (left <= 0) {
+        // expired
+        clearQuizState();
+      } else {
+        setQuestions(saved.questions);
+        setAnswers(saved.answers ?? []);
+        setCurrentIndex(saved.currentIndex);
+        setEndTimestamp(saved.endTimestamp);
+        setTimeLeft(left);
+        setFinished(false);
+        return;
+      }
     }
 
-    const cfgRaw = localStorage.getItem('quiz_config_v1');
-    if (!cfgRaw) {
+    // No resume -> read config and start new
+    const configuration = localStorage.getItem('quiz_config_v1');
+    if (!configuration) {
       setError('Konfigurasi kuis tidak ditemukan. Kembali ke setup.');
       return;
     }
-    const cfg = JSON.parse(cfgRaw) as {
-      amount: number;
-      category?: number;
-      difficulty?: string;
-      type?: string;
-      totalTime: number;
-    };
-    startNewSession(cfg).catch((e) => {
-      console.error(e);
-      setError(String(e) || 'Gagal memulai kuis');
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    try {
+      const cfg = JSON.parse(configuration) as {
+        amount: number;
+        category?: number;
+        difficulty?: string;
+        type?: string;
+        totalTime: number;
+      };
+      startNewSession(cfg).catch((e) => {
+        console.error(e);
+        setError(String(e) || 'Gagal memulai kuis');
+      });
+    } catch (e) {
+      console.error('Invalid quiz_config_v1', e);
+      setError('Konfigurasi kuis rusak. Kembali ke setup.');
+    }
   }, []);
 
-  useInterval(() => {
-    if (!startedAt || finished) return;
-    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-    const left = Math.max(0, totalTime - elapsed);
-    setTimeLeft(left);
-    if (left <= 0) handleFinish();
-  }, 1000);
-
-  async function startNewSession(cfg: {
+  // start new session
+  const startNewSession = async (configuration: {
     amount: number;
     category?: number;
     difficulty?: string;
     type?: string;
     totalTime: number;
-  }) {
+  }) => {
     setLoading(true);
     setError(null);
     try {
-      const qs = await fetchQuestions({
-        amount: cfg.amount,
-        category: cfg.category,
-        difficulty: cfg.difficulty,
-        type: cfg.type,
+      const questions = await fetchAndMapQuestions({
+        amount: configuration.amount,
+        category: configuration.category,
+        difficulty: configuration.difficulty,
+        type: configuration.type,
       });
-      setQuestions(qs);
+      setQuestions(questions);
       setAnswers([]);
       setCurrentIndex(0);
       const now = Date.now();
-      setStartedAt(now);
-      const tt = cfg.totalTime ?? 300;
-      setTotalTime(tt);
-      setTimeLeft(tt);
+      const endTime = now + (configuration.totalTime ?? 300) * 1000;
+      setEndTimestamp(endTime);
+      setTimeLeft(Math.ceil(configuration.totalTime ?? 300));
       setFinished(false);
 
-      const state: StoredQuizState = {
-        questions: qs,
+      const payload = {
+        questions: questions,
         answers: [],
         currentIndex: 0,
-        startedAt: now,
-        totalTime: tt,
-        finished: false,
-        amount: cfg.amount,
-        type: cfg.type,
+        endTimestamp: endTime,
+        createdAt: new Date().toISOString(),
+        totalTime: configuration.totalTime ?? 300,
       };
-      saveQuizState(state);
+      saveQuizState(payload);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
+  // interval sesuai dengan endTimestamp
+  useInterval(() => {
+    if (!endTimestamp || finished) return;
+    const left = Math.max(0, Math.ceil((endTimestamp - Date.now()) / 1000));
+    setTimeLeft(left);
+    if (left <= 0) {
+      handleFinish();
+    }
+  }, 1000);
+
+  //prepare load quiz
+  useEffect(() => {
+    const handler = () => {
+      const payload = {
+        questions,
+        answers,
+        currentIndex,
+        endTimestamp,
+        createdAt: new Date().toISOString(),
+        totalTime: Math.max(
+          1,
+          Math.ceil(((endTimestamp ?? 0) - Date.now()) / 1000)
+        ),
+      };
+
+      try {
+        // Save quiz
+        localStorage.setItem('quiz_resume_v1', JSON.stringify(payload));
+      } catch {}
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [questions, answers, currentIndex, endTimestamp]);
+
+  // Handle Answer
   const handleAnswer = (choice: string) => {
     if (!questions[currentIndex]) return;
-    // prevent double
     if (answers.some((a) => a.questionIdx === currentIndex)) return;
 
-    const q = questions[currentIndex];
-    const correct = q.correct_answer;
+    const question = questions[currentIndex];
+    const correct = question.correctAnswer ?? '';
     const isCorrect = choice === correct;
-    const ans: StoredAnswer = {
+    const answer = {
       questionIdx: currentIndex,
       selected: choice,
       correct,
@@ -486,20 +865,22 @@ const QuizSessionPage: React.FC = () => {
       answeredAt: Date.now(),
     };
 
-    const nextAnswers = [...answers, ans];
+    const nextAnswers = [...answers, answer];
     setAnswers(nextAnswers);
 
-    const persisted: StoredQuizState = {
+    const safeEnd = endTimestamp ?? Date.now();
+    const persisted = {
       questions,
       answers: nextAnswers,
       currentIndex: currentIndex + 1,
-      startedAt: startedAt ?? Date.now(),
-      totalTime,
-      finished: false,
-      amount: questions.length,
-      type: questions[0]?.type,
+      endTimestamp: safeEnd,
+      createdAt: new Date().toISOString(),
+      totalTime: Math.max(
+        1,
+        Math.ceil(((endTimestamp ?? 0) - Date.now()) / 1000)
+      ),
     };
-    saveQuizState(persisted);
+    saveThrottled.current(persisted);
 
     if (currentIndex + 1 < questions.length) setCurrentIndex((i) => i + 1);
     else handleFinish();
@@ -507,33 +888,83 @@ const QuizSessionPage: React.FC = () => {
 
   const handleFinish = () => {
     setFinished(true);
-    const persisted: StoredQuizState = {
-      questions,
-      answers,
-      currentIndex,
-      startedAt: startedAt ?? Date.now(),
-      totalTime,
-      finished: true,
-      amount: questions.length,
-      type: questions[0]?.type,
+
+    const payload = {
+      questions: questions,
+      answers: [],
+      currentIndex: 0,
+      endTimestamp: endTimestamp,
+      createdAt: new Date().toISOString(),
+      totalTime: Math.max(
+        1,
+        Math.ceil(((endTimestamp ?? 0) - Date.now()) / 1000)
+      ),
     };
-    saveQuizState(persisted);
+
+    try {
+      // Simpan hasil akhir di key terpisah
+      localStorage.setItem('quiz_final_v1', JSON.stringify(payload));
+    } catch (error) {
+      console.warn('Failed to save final quiz results', error);
+    }
+
+    try {
+      clearQuizState();
+    } catch (e) {
+      console.warn('clearQuizState failed', e);
+    }
+
+    navigate('/quiz-result', {
+      state: {
+        questions,
+        answers,
+        totalTime: payload.totalTime,
+        finishedAt: new Date().toISOString(),
+      },
+    });
   };
 
   const handleAbort = () => {
-    if (!confirm('Yakin batalkan kuis? Progress akan dihapus.')) return;
+    if (!window.confirm('Yakin batalkan kuis? Progress akan dihapus.')) return;
     clearQuizState();
     navigate('/quiz-setup');
   };
 
   const handleSubmitAndExit = () => {
-    // navigate to result page (leading slash)
+    const payload = {
+      questions,
+      answers,
+      currentIndex,
+      endTimestamp,
+      createdAt: new Date().toISOString(),
+      totalTime: Math.max(
+        1,
+        Math.ceil(((endTimestamp ?? 0) - Date.now()) / 1000)
+      ),
+    };
+
+    try {
+      localStorage.setItem('quiz_final_v1', JSON.stringify(payload));
+    } catch (e) {
+      console.warn('Failed to save final snapshot before exit', e);
+    }
+
+    // go to results page with data
     navigate('/quiz-result', {
-      state: { questions, answers, totalTime, startedAt },
+      state: {
+        questions,
+        answers,
+        totalTime: payload.totalTime,
+      },
     });
+
+    try {
+      clearQuizState();
+    } catch (e) {
+      console.warn('clearQuizState failed', e);
+    }
   };
 
-  // derived
   const total = questions.length;
   const answeredCount = answers.length;
   const correctCount = answers.filter((a) => a.isCorrect).length;
@@ -542,10 +973,9 @@ const QuizSessionPage: React.FC = () => {
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
     const sec = s % 60;
-    return `${m}:${sec.toString().padStart(2, '0')}`;
+    return `${m}:${String(sec).padStart(2, '0')}`;
   };
 
-  // UI guards
   if (error) {
     return (
       <div className='p-6 max-w-xl mx-auto'>
@@ -605,38 +1035,11 @@ const QuizSessionPage: React.FC = () => {
               Lihat Detail / Export
             </button>
           </div>
-
-          <hr className='my-4' />
-          <h3 className='font-semibold mb-2'>Detail Jawaban</h3>
-          <div className='space-y-3'>
-            {answers.map((a) => {
-              const q = questions[a.questionIdx];
-              return (
-                <div key={a.questionIdx} className='p-3 border rounded'>
-                  <div className='text-sm mb-1'>{decodeHtml(q.question)}</div>
-                  <div className='text-xs'>
-                    Jawaban kamu: {decodeHtml(a.selected)}
-                  </div>
-                  <div className='text-xs'>
-                    Jawaban benar: {decodeHtml(a.correct)}
-                  </div>
-                  <div
-                    className={`text-xs ${
-                      a.isCorrect ? 'text-success' : 'text-danger'
-                    }`}
-                  >
-                    {a.isCorrect ? 'Benar' : 'Salah'}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         </div>
       </div>
     );
   }
 
-  // normal quiz UI - guard that question exists
   const currentQuestion = questions[currentIndex];
   if (!currentQuestion) {
     return (
@@ -645,14 +1048,13 @@ const QuizSessionPage: React.FC = () => {
       </div>
     );
   }
-
   return (
     <div className='p-6 max-w-xl mx-auto'>
       <div className='flex justify-between items-center mb-4'>
         <div>
           Total soal: {total} | Dikerjakan: {answeredCount}
         </div>
-        <div>
+        <div role='status' aria-live='polite'>
           Time left: <span className='font-mono'>{formatTime(timeLeft)}</span>
         </div>
       </div>
@@ -664,6 +1066,7 @@ const QuizSessionPage: React.FC = () => {
 
         <QuestionCard
           question={currentQuestion}
+          index={currentIndex}
           onAnswer={handleAnswer}
           disabled={finished}
         />
@@ -672,16 +1075,21 @@ const QuizSessionPage: React.FC = () => {
           <button
             onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
             disabled={currentIndex === 0}
+            className='btn-secondary'
           >
             Prev
           </button>
           <button
             onClick={() => setCurrentIndex((i) => Math.min(total - 1, i + 1))}
             disabled={currentIndex === total - 1}
+            className='btn-secondary'
           >
             Next
           </button>
-          <button onClick={() => handleFinish()} className='ml-auto'>
+          <button
+            onClick={() => handleFinish()}
+            className='ml-auto btn-primary'
+          >
             Submit
           </button>
           <button onClick={() => handleAbort()} className='ml-2 btn-secondary'>

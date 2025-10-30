@@ -15,7 +15,7 @@ const baseStyleLabel = 'font-bold text-neutral/80 text-md';
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, inputClassName, labelClassName, id, error, ...props }, ref) => {
     return (
-      <div className=''>
+      <div>
         {label && (
           <label htmlFor={id} className={clsx(baseStyleLabel, labelClassName)}>
             {label}

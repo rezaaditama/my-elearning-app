@@ -1,14 +1,8 @@
 import axios from 'axios';
+import { decodeHtml } from '../utils/htmlDecode';
+import type { RawQuestion, Question } from '../types/quizType';
 
 export type Category = { id: number; name: string };
-export type RawQuestions = {
-  category: string;
-  type: 'multiple' | 'boolean';
-  difficulty: 'easy' | 'medium' | 'hard';
-  question: string;
-  correct_answer: string;
-  incorrect_answer: string[];
-};
 
 const API_BASE = 'https://opentdb.com';
 const CATEGORY_CACHE_KEY = 'otdb_categories_v1';
@@ -54,7 +48,7 @@ export const fetchQuestions = async (params: {
   category?: number;
   difficulty?: string;
   type?: string;
-}): Promise<RawQuestions[]> => {
+}): Promise<RawQuestion[]> => {
   const urlParams = new URLSearchParams();
   urlParams.set('amount', String(params.amount));
 
@@ -71,5 +65,36 @@ export const fetchQuestions = async (params: {
     );
   }
 
-  return response.data.results as RawQuestions[];
+  return response.data.results as RawQuestion[];
+};
+
+//Shuffle Question
+const shuffle = <T,>(array: T[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+};
+
+export const fetchAndMapQuestions = async (params: {
+  amount: number;
+  category?: number;
+  difficulty?: string;
+  type?: string;
+}): Promise<Question[]> => {
+  const raws = await fetchQuestions(params);
+  return raws.map((r, idx) => {
+    const decodedQuestion = decodeHtml(r.question);
+    const correct = decodeHtml(r.correct_answer);
+    const incorrects = r.incorrect_answers.map(decodeHtml);
+    const choices = shuffle([...incorrects, correct]);
+    return {
+      id: `${btoa(decodedQuestion).slice(0, 12)}_${idx}`,
+      type: r.type as 'multiple' | 'boolean',
+      question: decodedQuestion,
+      choices,
+      correctAnswer: correct,
+    } as Question;
+  });
 };

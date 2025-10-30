@@ -6,6 +6,8 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import ErrorPage from './pages/ErrorPage';
 import QuizPage from './pages/SetupQuizPage';
 import QuizSessionPage from './pages/QuizSessionPage';
+import QuizResultPage from './pages/ResultQuizPage';
+import { requireAuthLoader } from './utils/auth';
 
 const router = createBrowserRouter([
   {
@@ -16,10 +18,17 @@ const router = createBrowserRouter([
   {
     path: '/quiz-setup',
     element: <QuizPage />,
+    loader: requireAuthLoader,
   },
   {
     path: '/quiz-session',
     element: <QuizSessionPage />,
+    loader: requireAuthLoader,
+  },
+  {
+    path: '/quiz-result',
+    element: <QuizResultPage />,
+    loader: requireAuthLoader,
   },
 ]);
 
