@@ -3,8 +3,8 @@ import axios from 'axios';
 export type Category = { id: number; name: string };
 export type RawQuestions = {
   category: string;
-  type: string;
-  difficulty: string;
+  type: 'multiple' | 'boolean';
+  difficulty: 'easy' | 'medium' | 'hard';
   question: string;
   correct_answer: string;
   incorrect_answer: string[];
@@ -16,7 +16,7 @@ const CATEGORY_CACHE_TTL = 1000 * 60 * 60 * 24;
 
 //Mengambil data category
 export const getCategories = async (): Promise<Category[]> => {
-  //Mengambil localstorage
+  //Caching category dari localstorage
   try {
     const cacheCategory = localStorage.getItem(CATEGORY_CACHE_KEY);
     if (cacheCategory) {
@@ -29,12 +29,12 @@ export const getCategories = async (): Promise<Category[]> => {
       }
     }
   } catch (error) {
-    console.warn('Category cache read failed');
+    console.warn('Category cache read failed', error);
   }
 
   //Fetching API
-  const res = await axios.get(`${API_BASE}/api_category.php`);
-  const categories = (res.data?.trivia_categories ?? []) as Category[];
+  const response = await axios.get(`${API_BASE}/api_category.php`);
+  const categories = (response.data?.trivia_categories ?? []) as Category[];
 
   //Simpan cache
   try {
@@ -43,35 +43,33 @@ export const getCategories = async (): Promise<Category[]> => {
       JSON.stringify({ timeStamp: Date.now(), data: categories })
     );
   } catch (error) {
-    console.warn('Category cache write failed');
+    console.warn('Category cache write failed', error);
   }
   return categories;
 };
 
 //Mengambil data pertanyaan
-export const fetchQuestions = async (userConfiguration: {
+export const fetchQuestions = async (params: {
   amount: number;
   category?: number;
   difficulty?: string;
   type?: string;
 }): Promise<RawQuestions[]> => {
   const urlParams = new URLSearchParams();
-  urlParams.set('amount', String(userConfiguration.amount));
-  if (userConfiguration.category) {
-    urlParams.set('category', String(userConfiguration.category));
-  }
-  if (userConfiguration.difficulty) {
-    urlParams.set('difficulty', userConfiguration.difficulty);
-  }
-  if (userConfiguration.type) {
-    urlParams.set('type', userConfiguration.type);
-  }
+  urlParams.set('amount', String(params.amount));
+
+  if (params.category) urlParams.set('category', String(params.category));
+  if (params.difficulty) urlParams.set('difficulty', params.difficulty);
+  if (params.type) urlParams.set('type', params.type);
+
   const url = `${API_BASE}/api.php?${urlParams.toString()}`;
   const response = await axios.get(url);
+
   if (response.data.response_code !== 0) {
-    throw Error(
+    throw new Error(
       `OpenTDB returned response_code=${response.data.response_code}`
     );
   }
+
   return response.data.results as RawQuestions[];
 };
