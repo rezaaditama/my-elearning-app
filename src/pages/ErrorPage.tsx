@@ -4,9 +4,12 @@ import Button from '../components/Button';
 const NotFoundPage = () => {
   const navigate = useNavigate();
 
-  // Arahkan ke halaman login
   const handleBackHome = () => {
-    navigate('/', { replace: true });
+    if (window.history.length > 2) {
+      navigate(-1);
+    } else {
+      navigate('/', { replace: true });
+    }
   };
 
   return (

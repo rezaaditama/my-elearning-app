@@ -416,6 +416,7 @@ const QuizSessionPage: React.FC = () => {
           </h3>
 
           <QuestionCard
+            key={currentQuestion.id ?? currentIndex}
             question={currentQuestion}
             index={currentIndex}
             onAnswer={handleAnswer}

@@ -9,6 +9,9 @@ type QuestionCardProps = {
   storedAnswer?: string | null;
 };
 
+const normalize = (value: string | null | undefined) =>
+  value ? String(value).trim().toLowerCase() : '';
+
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   index,
@@ -22,7 +25,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     if (storedAnswer) {
       setSelected(storedAnswer);
     }
-  }, [storedAnswer]);
+  }, [storedAnswer, question.id, question]);
 
   //Handle Select
   const handleSelect = (value: string) => {
@@ -40,30 +43,34 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       <div
         className='grid gap-2'
         role='radiogroup'
-        aria-labelledby={`question-${question.id}`}
+        aria-labelledby={`question-${question.id ?? index}`}
       >
-        {question.choices.map((choice, i) => (
-          <label
-            key={`${question.id}-choice-${i}`}
-            className={`p-3 border rounded cursor-pointer text-left ${
-              selected === choice
-                ? 'border-primary bg-primary/5'
-                : 'border-neutral/20'
-            }`}
-          >
-            <input
-              type='radio'
-              name={`quiz-choice-${index}`}
-              value={choice}
-              checked={selected === choice}
-              onChange={() => handleSelect(choice)}
-              className='mr-3'
-              disabled={disabled}
-              aria-checked={selected === choice}
-            />
-            <span>{choice}</span>
-          </label>
-        ))}
+        {question.choices.map((choice, i) => {
+          const isSelected =
+            selected !== null && normalize(choice) === normalize(selected);
+          return (
+            <label
+              key={`${question.id ?? index}-choice-${i}`}
+              className={`p-3 border rounded cursor-pointer text-left ${
+                selected === choice
+                  ? 'border-primary bg-primary/5'
+                  : 'border-neutral/20'
+              }`}
+            >
+              <input
+                type='radio'
+                name={`quiz-choice-${question.id ?? index}`}
+                value={choice}
+                checked={isSelected}
+                onChange={() => handleSelect(choice)}
+                className='mr-3'
+                disabled={disabled}
+                aria-checked={selected === choice}
+              />
+              <span>{choice}</span>
+            </label>
+          );
+        })}
       </div>
     </div>
   );
