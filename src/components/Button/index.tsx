@@ -1,18 +1,20 @@
 import clsx from 'clsx';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type Variant = 'primary' | 'secondary' | 'ghost';
+type Variant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'accent';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   variant?: Variant;
 }
 
-const baseStyle = 'w-full rounded-md font-bold cursor-pointer';
+const baseStyle = 'rounded-md font-bold cursor-pointer';
 
 const variantClass = {
-  primary: 'bg-primary text-surface hover:bg-primary-hover p-1.5',
-  secondary: 'bg-secondary text-surface hover:bg-secondary-hover p-1.5',
+  primary: 'bg-primary text-surface hover:bg-primary-hover',
+  secondary: 'bg-secondary text-surface hover:bg-secondary-hover',
+  accent: 'text-neutral rounded-md border',
+  danger: 'bg-danger text-surface hover:bg-danger-hover',
   ghost: 'bg-transparent',
 };
 

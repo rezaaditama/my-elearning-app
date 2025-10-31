@@ -1,5 +1,4 @@
-// src/components/QuestionCard.tsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Question } from '../../types/quizType';
 
 type QuestionCardProps = {
@@ -7,6 +6,7 @@ type QuestionCardProps = {
   index: number;
   onAnswer: (choice: string) => void;
   disabled?: boolean;
+  storedAnswer?: string | null;
 };
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -14,8 +14,15 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   index,
   onAnswer,
   disabled,
+  storedAnswer,
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (storedAnswer) {
+      setSelected(storedAnswer);
+    }
+  }, [storedAnswer]);
 
   //Handle Select
   const handleSelect = (value: string) => {

@@ -265,7 +265,12 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
 
         {/* Trigger */}
         <div className='flex flex-col gap-y-2'>
-          <Button variant='primary' type={'submit'} disabled={isSubmitting}>
+          <Button
+            variant='primary'
+            type={'submit'}
+            disabled={isSubmitting}
+            className='py-1.5'
+          >
             Start Quiz
           </Button>
           {localStorage.getItem('quiz_resume_v1') && (
@@ -274,6 +279,7 @@ const FormSetupQuiz: React.FC<FormSetupQuizProps> = ({ onSubmit }) => {
               variant='secondary'
               onClick={handleContinue}
               disabled={!hasResume}
+              className='py-1.5'
             >
               Continue Quiz
             </Button>

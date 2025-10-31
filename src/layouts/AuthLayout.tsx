@@ -87,7 +87,7 @@ const AuthLayout: React.FC = () => {
       </div>
 
       <div className='text-center space-y-2'>
-        <Button type='submit' disabled={isSubmitting}>
+        <Button type='submit' disabled={isSubmitting} className='w-full py-1.5'>
           Submit
         </Button>
       </div>
